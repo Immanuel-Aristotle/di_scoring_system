@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase Demo</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/dist/supabase.min.js"></script>
+</head>
+<body>
+
+  <h1>Supabase Message App</h1>
+
+  <form id="message-form">
+    <label for="message">Enter your message:</label>
+    <input type="text" id="message" name="message" required>
+    <button type="submit">Submit</button>
+  </form>
+
+  <h2>Messages:</h2>
+  <ul id="messages-list"></ul>
+
+  <script>
+    // Replace with your Supabase project URL and anon key
+    const supabaseUrl = 'https://rhmaepjpuungmznmasjk.supabase.co'
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJobWFlcGpwdXVuZ216bm1hc2prIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk3NzQ3NDYsImV4cCI6MjA1NTM1MDc0Nn0.hYmf7ZCoDI1toEIvJmuC_1WgeDLYS-6oZWJhRjP1mnU"
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    const messageForm = document.getElementById('message-form');
+    const messagesList = document.getElementById('messages-list');
+    
+    // Function to fetch messages from Supabase
+    async function getMessages() {
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      // Clear current list and append fetched messages
+      messagesList.innerHTML = '';
+      data.forEach(message => {
+        const li = document.createElement('li');
+        li.textContent = message.content;
+        messagesList.appendChild(li);
+      });
+    }
+
+    // Handle form submission
+    messageForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const messageInput = document.getElementById('message');
+      const messageContent = messageInput.value;
+
+      // Insert the message into Supabase
+      const { data, error } = await supabase
+        .from('messages')
+        .insert([{ content: messageContent }]);
+
+      if (error) {
+        console.error(error);
+      } else {
+        // Clear the input field and fetch new messages
+        messageInput.value = '';
+        getMessages();
+      }
+    });
+
+    // Load messages when the page loads
+    window.onload = getMessages;
+  </script>
+
+</body>
+</html>
