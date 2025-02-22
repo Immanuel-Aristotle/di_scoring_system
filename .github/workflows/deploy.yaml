@@ -7,7 +7,11 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # Runs on the latest Ubuntu
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Ensure write permissions for the repository contents
+      pages: write     # Ensure write permissions to the gh-pages branch
 
     steps:
     # Step 1: Checkout the repository
